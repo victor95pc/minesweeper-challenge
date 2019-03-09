@@ -20,11 +20,12 @@ class GamesController < ApplicationController
     property :board_height, Integer, desc: 'board height'
     property :amount_bombs, Integer, desc: 'Amount of bombs in the board'
     property :is_gameover, :boolean, desc: 'Show if the player click on a bomb'
+    property :win_game, :boolean, desc: 'Show if the player click on a bomb'
     property :revealed_positions, Array, desc: 'Array showing revealed positions'
   end
 
   def index
-    render json: Game.all, methods: [:is_gameover, :revealed_positions]
+    render json: Game.all, methods: [:is_gameover, :revealed_positions, :win_game]
   end
 
   api :GET,  '/games/:id', 'To get Game by ID'
@@ -35,10 +36,11 @@ class GamesController < ApplicationController
     property :board_height, Integer, desc: 'board height'
     property :amount_bombs, Integer, desc: 'Amount of bombs in the board'
     property :is_gameover, :boolean, desc: 'Show if the player click on a bomb'
+    property :win_game, :boolean, desc: 'Show if the player win the game'
     property :revealed_positions, Array, desc: 'Array showing revealed positions'
   end
   def show
-    render json: @game, methods: [:is_gameover, :revealed_positions]
+    render json: @game, methods: [:is_gameover, :revealed_positions, :win_game]
   end
 
   api :POST, '/games', 'Create a new game'

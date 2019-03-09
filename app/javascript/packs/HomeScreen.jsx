@@ -10,6 +10,10 @@ function isInsideCollection(sub, master) {
   return master.map(i => JSON.stringify(i)).includes(JSON.stringify(sub));
 }
 
+function getIndexFromInsideCollection(sub, master) {
+  return master.map(i => JSON.stringify(i)).indexOf(JSON.stringify(sub));
+}
+
 
 function fetcher(url, object, method) {
   return fetch(url, {
@@ -23,11 +27,24 @@ export default class HomeScreen extends React.Component {
   constructor(props) {
     super(props)
 
-    this.state = { games: [], selectedGame: null }
+    this.state = { games: [], selectedGame: null, newGame: {} }
 
     fetch("/api/games").then(r => r.json()).then(games => {
       this.setState({ games })
     })
+  }
+
+  onNewGameSubmit = (e) => {
+    e.preventDefault();
+
+    fetcher(`/api/games/`, this.state.newGame, 'post')
+      .then(r => r.json())
+      .then(() => window.location.reload())
+  }
+
+  onNewGameChange = (field, value) => {
+    let newGame = { ...this.state.newGame, [field]: value };
+    this.setState({ newGame });
   }
 
   onRowRightClick = (x,y,e) => {
@@ -38,16 +55,20 @@ export default class HomeScreen extends React.Component {
     let cellText = this.renderCell(x,y);
 
     let method = null;
+    let url    = null;
 
     if (cellText === "V") {
       method = "POST";
+      url    = `/api/games/${selectedGame.id}/flags`;
     }
     else if (cellText === "F") {
-      method = "DESTROY";
+      method    = "DELETE";
+      let index = getIndexFromInsideCollection([x,y], selectedGame.flags);
+      url       = `/api/games/${selectedGame.id}/flags/${index}`;
     }
 
     if (method) {
-      fetcher(`/api/games/${selectedGame.id}/flags`, { x, y }, method).then(r => r.json())
+      fetcher(url, { x, y }, method).then(r => r.json())
         .then(flags => {
           return fetch(`/api/games/${selectedGame.id}`).then(r => r.json())
         })
@@ -130,20 +151,57 @@ export default class HomeScreen extends React.Component {
     });
   }
 
+  renderGameList() {
+    let { games } = this.state;
+    return games.map(g => <li key={g.id} onClick={() => this.setState({ selectedGame: g })}>{g.name}</li>)
+  }
+
+  warnAboutGame() {
+    let { selectedGame } = this.state;
+    if (selectedGame.is_gameover) {
+      return "You lose :("
+    }
+
+    if (selectedGame.win_game) {
+      return "You WIN!! ;)"
+    }
+  }
+
   render() {
     let { selectedGame, games } = this.state;
     if (selectedGame) {
       let { bombs, clicked_cell, revealed_positions, board_width, board_height } = selectedGame;
       return (
-        <table>
-          <tbody>
-            {this.renderTBody()}
-          </tbody>
-        </table>
+        <div>
+          <h2>{this.warnAboutGame()}</h2>
+          <table>
+            <tbody>
+              {this.renderTBody()}
+            </tbody>
+          </table>
+
+          <h5>Legend:</h5>
+          <p>R = Revealed</p>
+          <p>V = Empty</p>
+          <p>C = Clicked</p>
+          <p>B = Bomb</p>
+          <p>F = Flag</p>
+        </div>
       )
     }
     else {
-      return games.map(g => <li key={g.id} onClick={() => this.setState({ selectedGame: g })}>{g.name}</li>)
+      return (
+        <div>
+          {this.renderGameList()}
+          <form onSubmit={this.onNewGameSubmit}>
+            <input required type="text" placeholder="Name" onChange={v => this.onNewGameChange("name", v.target.value)} />
+            <input required type="number" placeholder="Board Width" onChange={v => this.onNewGameChange("board_width", parseInt(v.target.value))} />
+            <input required type="number" placeholder="Board Height" onChange={v => this.onNewGameChange("board_height", parseInt(v.target.value))} />
+            <input required type="number" placeholder="Amount of Bombs" onChange={v => this.onNewGameChange("amount_bombs", parseInt(v.target.value))} />
+            <input type="submit" value="Create" />
+          </form>
+        </div>
+      )
     }
   }
 }

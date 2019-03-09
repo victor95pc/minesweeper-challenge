@@ -28,9 +28,11 @@ class CellClicksController < ApplicationController
 
   api :DESTROY, '/games/:game_id/cell_clicks/:id', 'Update a old game'
   param :game_id, String, required: true, desc: 'Game ID'
-  param :id, Integer, required: true, desc: 'cell click index position'
+  param :id, String, required: true, desc: 'cell click index position'
   def destroy
-    clicked_cells = @game.clicked_cells.delete_at(params[:id])
+    clicked_cells = @game.clicked_cells
+
+    clicked_cells = clicked_cells - [clicked_cells[params[:id].to_i]]
 
     @game.update_attributes(clicked_cells: clicked_cells)
 

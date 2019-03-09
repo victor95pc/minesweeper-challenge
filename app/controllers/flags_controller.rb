@@ -28,9 +28,11 @@ class FlagsController < ApplicationController
 
   api :DESTROY, '/games/:game_id/flags/:id', 'Remove the flag'
   param :game_id, String, required: true, desc: 'Game ID'
-  param :id, Integer, required: true, desc: 'flag index position'
+  param :id, String, required: true, desc: 'flag index position'
   def destroy
-    flags = @game.flags.delete_at(params[:id])
+    flags = @game.flags
+
+    flags = flags - [flags[params[:id].to_i]]
 
     @game.update_attributes(flags: flags)
 

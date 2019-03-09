@@ -10,7 +10,11 @@ class Game < ApplicationRecord
   before_create :generate_bombs
 
   def revealed_positions
-    clicked_cells[0..0].map { |c_c| get_revealed_positions(*c_c) }.flatten(1).uniq
+    (clicked_cells - bombs).map { |c_c| get_revealed_positions(*c_c) }.flatten(1).uniq
+  end
+
+  def win_game
+    revealed_positions.size == (board_width * board_height) - amount_bombs
   end
 
   def is_gameover?
