@@ -19,14 +19,16 @@ class GamesController < ApplicationController
     property :board_width, Integer, desc: 'board width'
     property :board_height, Integer, desc: 'board height'
     property :amount_bombs, Integer, desc: 'Amount of bombs in the board'
+    property :is_gameover, :boolean, desc: 'Show if the player click on a bomb'
+    property :revealed_positions, Array, desc: 'Array showing revealed positions'
   end
 
   def index
-    respond_with Game.all
+    render json: Game.all, methods: [:is_gameover, :revealed_positions]
   end
 
   api :GET,  '/games/:id', 'To get Game by ID'
-  param :id, Integer, required: true, desc: 'Game ID'
+  param :id, String, required: true, desc: 'Game ID'
   def show
     respond_with @game
   end

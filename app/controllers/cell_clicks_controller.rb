@@ -8,7 +8,6 @@ class CellClicksController < ApplicationController
     EOS
   end
 
-  before_action :apipie_validations
   before_action :get_game
 
   respond_to :json
@@ -45,6 +44,6 @@ class CellClicksController < ApplicationController
   end
 
   def cell_click_params
-    params.require(:cell_click).permit(:x, :y)
+    params.permit(:x, :y)
   end
 end

@@ -19,3 +19,12 @@ console.log('Hello World from Webpacker')
 
 import React from "react";
 import ReactDOM from "react-dom";
+import HomeScreen from "./HomeScreen";
+
+
+document.addEventListener('DOMContentLoaded', () => {
+  ReactDOM.render(
+    <HomeScreen />,
+    document.getElementById('react-container')
+  )
+})

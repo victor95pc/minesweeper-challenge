@@ -8,7 +8,6 @@ class FlagsController < ApplicationController
     EOS
   end
 
-  before_action :apipie_validations
   before_action :get_game
 
   respond_to :json

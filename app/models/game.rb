@@ -16,6 +16,7 @@ class Game < ApplicationRecord
   def is_gameover?
     clicked_cells.any? { |clicked_cell| clicked_cell.in?(bombs) }
   end
+  alias is_gameover is_gameover?
 
   private
 
