@@ -10,6 +10,15 @@ function isInsideCollection(sub, master) {
   return master.map(i => JSON.stringify(i)).includes(JSON.stringify(sub));
 }
 
+
+function fetcher(url, object, method) {
+  return fetch(url, {
+    method,
+    headers: {'Content-Type': 'application/json', 'Accept': 'application/json, text/plain',},
+    body:    JSON.stringify(object)
+  });
+}
+
 export default class HomeScreen extends React.Component {
   constructor(props) {
     super(props)
@@ -21,7 +30,9 @@ export default class HomeScreen extends React.Component {
     })
   }
 
-  onRowRightClick = (x,y) => {
+  onRowRightClick = (x,y,e) => {
+    e.preventDefault();
+
     let { selectedGame } = this.state;
 
     let cellText = this.renderCell(x,y);
@@ -36,9 +47,13 @@ export default class HomeScreen extends React.Component {
     }
 
     if (method) {
-      fetch(`/api/games/${selectedGame.id}/flags`, { method, body: JSON.stringify({ x, y }) }).then(r => r.json()).then(flags => {
-        this.setState({ selectedGame: { ...selectedGame, flags } });
-      });
+      fetcher(`/api/games/${selectedGame.id}/flags`, { x, y }, method).then(r => r.json())
+        .then(flags => {
+          return fetch(`/api/games/${selectedGame.id}`).then(r => r.json())
+        })
+        .then(selectedGame => {
+          this.setState({ selectedGame });
+        });
     }
   }
 
@@ -49,9 +64,13 @@ export default class HomeScreen extends React.Component {
 
     switch (cellText) {
       case "V":
-        fetch(`/api/games/${selectedGame.id}/cell_clicks`, { method: 'POST', body: JSON.stringify({ x, y }) }).then(r => r.json()).then(clicked_cells => {
-          this.setState({ selectedGame: { ...selectedGame, clicked_cells } });
-        });
+        fetcher(`/api/games/${selectedGame.id}/cell_clicks`, { x, y }, 'POST').then(r => r.json())
+          .then(clicked_cells => {
+            return fetch(`/api/games/${selectedGame.id}`).then(r => r.json())
+          })
+          .then(selectedGame => {
+            this.setState({ selectedGame });
+          });
       default:
     }
   }
@@ -67,11 +86,12 @@ export default class HomeScreen extends React.Component {
       return "B";
     }
 
-    if (isInsideCollection(position, revealed_positions)) {
-      return "R";
-    }
     else if (isInsideCollection(position, clicked_cells)) {
       return "C";
+    }
+
+    else if (isInsideCollection(position, revealed_positions)) {
+      return "R";
     }
     else if (isInsideCollection(position, flags)) {
       return "F";
@@ -89,7 +109,7 @@ export default class HomeScreen extends React.Component {
       let key = JSON.stringify([x,y]);
 
       return (
-        <td key={key} onContextMenu={() => this.onRowRightClick(x,y)} onClick={() => this.onRowClick(x,y)}>
+        <td key={key} onContextMenu={e => this.onRowRightClick(x,y, e)} onClick={() => this.onRowClick(x,y)}>
           {this.renderCell(x,y)}
         </td>
       )

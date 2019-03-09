@@ -29,8 +29,16 @@ class GamesController < ApplicationController
 
   api :GET,  '/games/:id', 'To get Game by ID'
   param :id, String, required: true, desc: 'Game ID'
+  returns code: 200, desc: "Detailed info about all games" do
+    property :name, String, desc: 'name of the Game'
+    property :board_width, Integer, desc: 'board width'
+    property :board_height, Integer, desc: 'board height'
+    property :amount_bombs, Integer, desc: 'Amount of bombs in the board'
+    property :is_gameover, :boolean, desc: 'Show if the player click on a bomb'
+    property :revealed_positions, Array, desc: 'Array showing revealed positions'
+  end
   def show
-    respond_with @game
+    render json: @game, methods: [:is_gameover, :revealed_positions]
   end
 
   api :POST, '/games', 'Create a new game'
