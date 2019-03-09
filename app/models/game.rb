@@ -9,6 +9,10 @@ class Game < ApplicationRecord
 
   before_create :generate_bombs
 
+  def is_gameover?
+    clicked_cells.any? { |clicked_cell| clicked_cell.in?(bombs) }
+  end
+
   private
 
   def has_more_bombs_than_board_supports
