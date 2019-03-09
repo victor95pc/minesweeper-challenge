@@ -1,24 +1,19 @@
 # README
 
-This README would normally document whatever steps are necessary to get the
-application up and running.
+Hi my name is Victor, dear Reviewer ;)
 
-Things you may want to cover:
+I'll list here some annotations doing this small project.
 
-* Ruby version
+* The React App is really messy, I would separate them in each file for each render method that I created.
 
-* System dependencies
+* React app does not have any validations, also something I would do.
 
-* Configuration
+* Timer is a library(react-timer).
 
-* Database creation
+* The reason why I put flags, bombs and clicked_cell on the same models was to avoid making joins everytime(performace).
 
-* Database initialization
+* The cell_clicks and the clicked_cell is the same I made a mistake typing them differently.
 
-* How to run the test suite
+* revealed_positions, win_game, is_gameover was suppose to be on the database, but I rush them(avoid doing a migration).
 
-* Services (job queues, cache servers, search engines, etc.)
-
-* Deployment instructions
-
-* ...
+* I made this in about 5 hour and half I don't know if this is a problem.
