@@ -1,6 +1,6 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
-
+import Timer from 'react-timer'
 
 function range(size) {
   return [...Array(size).keys()];
@@ -173,6 +173,7 @@ export default class HomeScreen extends React.Component {
       let { bombs, clicked_cell, revealed_positions, board_width, board_height } = selectedGame;
       return (
         <div>
+          <Timer options={{delay: 100}}/>
           <h2>{this.warnAboutGame()}</h2>
           <table>
             <tbody>
