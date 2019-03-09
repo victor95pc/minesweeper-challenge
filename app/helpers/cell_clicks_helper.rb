@@ -1,0 +1,2 @@
+module CellClicksHelper
+end
